@@ -3,7 +3,17 @@ BeforeAll {
 }
 
 Describe "GameOfLife" {
-    It "Returns expected output" {
-        GameOfLife | Should -Be "YOUR_EXPECTED_VALUE"
+    It "Shows board" {
+        $result = 
+@"
+-----
+-----
+-----
+-----
+-----
+"@
+
+        GameOfLife 5 5 | Should -Be $result
+        
     }
 }

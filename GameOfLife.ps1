@@ -1,3 +1,7 @@
-function GameOfLife {
-    throw [NotImplementedException]'GameOfLife is not implemented.'
+function GameOfLife($width, $height) {
+    $board = @()
+    for($i = 0; $i -lt $height; ++$i) {
+        $board += "-" * $width
+    }
+    $board -join "`r`n"
 }
