@@ -16,4 +16,18 @@ Describe "GameOfLife" {
         GameOfLife 5 5 | Should -Be $result
         
     }
+
+    It "Shows initial cells" {
+        $result = 
+@"
+-----
+-----
+-***-
+-----
+-----
+"@
+
+        WriteCells (GameOfLife 5 5) ((2, 3), (3, 3), (4, 3)) | Should -Be $result
+        
+    }
 }
