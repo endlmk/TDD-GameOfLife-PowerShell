@@ -54,3 +54,13 @@ function remainder([Int]$a, [Int]$b) {
 function WrapEdge([Pos]$pos, [Int]$width, [Int]$height) {
     [Pos]::new((remainder ($pos.X - 1) $width) + 1, (remainder ($pos.Y - 1) $height) + 1)
 }
+
+function IsAlive([Pos]$p, $cells, [Int]$width, [Int]$height) {
+    $cellsCount = CountNeighbors $p $cells $width $height
+    if($cells -contains $p) {
+        ($cellsCount -eq 2) -or ($cellsCount -eq 3)
+    }
+    else {
+        $cellsCount -eq 3
+    }
+}
