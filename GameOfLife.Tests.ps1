@@ -5,22 +5,8 @@ BeforeAll {
 }
 
 Describe "GameOfLife" {
-    It "Shows board" {
-        $result = 
-@"
------
------
------
------
------
-"@
-
-        GameOfLife 5 5 | Should -Be $result
-        
-    }
-
     It "Shows initial cells" {
-        $result = 
+        $expected = 
 @"
 -----
 -----
@@ -29,8 +15,9 @@ Describe "GameOfLife" {
 -----
 "@
 
-        WriteCells (GameOfLife 5 5) @([Pos]::new(2, 3), [Pos]::new(3, 3), [Pos]::new(4, 3)) | Should -Be $result
-        
+        $result = GameOfLife 5 5 @([Pos]::new(2, 3), [Pos]::new(3, 3), [Pos]::new(4, 3))
+        $result[0] | Should -Be $expected
+        $result[1] | Should -Be @([Pos]::new(3, 2), [Pos]::new(3, 3), [Pos]::new(3, 4))
     }
 }
 
@@ -70,5 +57,10 @@ Describe "CellBirthLiveDead" {
         IsAlive ([Pos]::new(1, 2)) @([Pos]::new(1, 2), [Pos]::new(5, 2), [Pos]::new(5, 3), [Pos]::new(1, 3)) 5 5 | Should -BeTrue
         IsAlive ([Pos]::new(1, 2)) @([Pos]::new(1, 2), [Pos]::new(5, 2)) 5 5 | Should -BeFalse
         IsAlive ([Pos]::new(1, 2)) @([Pos]::new(1, 2), [Pos]::new(5, 2), [Pos]::new(5, 3), [Pos]::new(1, 3), [Pos]::new(2, 3)) 5 5 | Should -BeFalse
+    }
+
+    It "Can Get Next Generation" {
+        NextGeneration @([Pos]::new(2, 3), [Pos]::new(3, 3), [Pos]::new(4, 3)) 5 5 | Should -Be @([Pos]::new(3, 2), [Pos]::new(3, 3), [Pos]::new(3, 4))
+        NextGeneration @([Pos]::new(3, 2), [Pos]::new(3, 3), [Pos]::new(3, 4)) 5 5 | Should -Be @([Pos]::new(2, 3), [Pos]::new(3, 3), [Pos]::new(4, 3))
     }
 }

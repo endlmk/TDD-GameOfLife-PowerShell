@@ -1,27 +1,19 @@
 using module ".\Pos.psm1"
 
 using namespace System.Collections.Generic
-function GameOfLife($width, $height) {
-    $board = @()
+function GameOfLife($width, $height, $cells) {
+    $board = [List[List[char]]]::new()
     for($i = 0; $i -lt $height; ++$i) {
-        $board += "-" * $width
+        $board.Add([List[char]]::new('-' * 5))
     }
-    $board -join "`r`n"
-}
-
-function WriteCells($board, $cells) {
-    $array = $board.Split("`r`n");
-    $array2 = [List[List[char]]]::new()
-    $array.ForEach({ $array2.Add($_.ToCharArray()) })
 
     foreach($p in $cells) {
-        $array2[$p.Y - 1][$p.X - 1] = '*'
+        $board[$p.Y - 1][$p.X - 1] = '*'
     }
-    $array3 = [List[String]]::new()
-    foreach($rows in $array2) {
-        $array3.Add([String]::new($rows.ToArray()))   
-    }
-    $array3 -join "`r`n"
+
+    $boardStr = ($board | ForEach-Object { [String]::new($_.ToArray()) }) -join "`r`n"
+    $nextGen = NextGeneration $cells $width $height
+    ($boardStr, $nextGen)
 }
 
 function IsNeighbor([Pos]$p1, [Pos]$p2, [Int]$width, [Int]$height) {
@@ -64,3 +56,26 @@ function IsAlive([Pos]$p, $cells, [Int]$width, [Int]$height) {
         $cellsCount -eq 3
     }
 }
+
+function NextGeneration($cells, [Int]$width, [Int]$height) {
+    $allPos = @()
+    for($y = 1; $y -le $height; ++$y) {
+        for($x = 1; $x -le $width; ++$x) {
+            $allPos += [Pos]::new($x, $y)
+        }
+    }
+
+    $allPos | Where-Object { IsAlive $_ $cells $width $height }
+}
+
+function GameOfLifeLoop($width, $height, $cells) {
+    $result = GameOfLife $width $height $cells
+    for(;;) {
+        Clear-Host
+        $result[0]
+        $result = GameOfLife $width $height $result[1]
+        Start-Sleep -Milliseconds 100
+    }
+}
+
+# GameOfLifeLoop 5 5 @([Pos]::new(2, 3), [Pos]::new(3, 3), [Pos]::new(4, 3))
