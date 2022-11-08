@@ -24,18 +24,33 @@ function WriteCells($board, $cells) {
     $array3 -join "`r`n"
 }
 
-function IsNeighbor([Pos]$p1, [Pos]$p2) {
+function IsNeighbor([Pos]$p1, [Pos]$p2, [Int]$width, [Int]$height) {
     $x1 = $p1.X
     $y1 = $p1.Y
-    $x2 = $p2.X
-    $y2 = $p2.Y
-    $xdiff = [Math]::Abs($x1 - $x2)
-    $ydiff = [Math]::Abs($y1 - $y2)
 
-    return ($xdiff -le 1) -and ($ydiff -le 1) -and (($xdiff -ne 0) -or ($ydiff -ne 0))
+    $neighbs = @(
+        ([Pos]::new($x1 - 1, $y1 - 1))
+        ([Pos]::new($x1 - 1, $y1))
+        ([Pos]::new($x1 - 1, $y1 + 1)) 
+        ([Pos]::new($x1, $y1 - 1))
+        ([Pos]::new($x1, $y1 + 1))
+        ([Pos]::new($x1 + 1, $y1 - 1))
+        ([Pos]::new($x1 + 1, $y1))
+        ([Pos]::new($x1 + 1, $y1 + 1))
+    )
+    $wrapNegihbs = $neighbs | ForEach-Object { WrapEdge $_ $width $height }
+    return $wrapNegihbs -contains $p2
 }
 
-function CountNeighbors([Pos]$pos, $cells) {
-    $neighbors = ($cells | Where-Object { IsNeighbor $pos $_ })
+function CountNeighbors([Pos]$pos, $cells, [Int]$width, [Int]$height) {
+    $neighbors = ($cells | Where-Object { IsNeighbor $pos $_ $width $height })
     $neighbors.Count
+}
+
+function remainder([Int]$a, [Int]$b) {
+    $a - [int][Math]::floor($a / $b) * $b
+}
+
+function WrapEdge([Pos]$pos, [Int]$width, [Int]$height) {
+    [Pos]::new((remainder ($pos.X - 1) $width) + 1, (remainder ($pos.Y - 1) $height) + 1)
 }
